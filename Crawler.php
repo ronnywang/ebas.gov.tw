@@ -105,16 +105,22 @@ class Crawler
     public function init()
     {
         //$this->getData();
-        $url = 'http://ebas1.ebas.gov.tw/pxweb/dialog/varval.asp?ma=NA0101A1A&ti=Wahaha&path=%2E%2E%2FPXfile%2FNationalIncome%2F&xu=&yp=&lang=9';
+        //$url = 'http://ebas1.ebas.gov.tw/pxweb/dialog/varval.asp?ma=NA0101A1A&ti=Wahaha&path=%2E%2E%2FPXfile%2FNationalIncome%2F&xu=&yp=&lang=9';
+        $url = $_SERVER['argv'][1];
 
         $list =  $this->getListFromURL($url);
         $years = $list['values1'];
         $topic = $list['values2'];
         $types = $list['values3'];
 
+        $ret = parse_url($url);
+        parse_str($ret['query'], $params);
+        $ti = iconv('big5', 'utf-8', $params['ti']);
+        mkdir('outputs/' . $ti . '/');
+
         foreach ($topic as $topic_id => $topic_name) {
             $topic_name = str_replace('/', '／', $topic_name);
-            $output = fopen('outputs/' . $topic_name . '.csv', 'w');
+            $output = fopen('outputs/' . $ti . '/' . $topic_name . '.csv', 'w');
             fputcsv($output, array('年分', '原始值', '年增率'));
             $ret = array();
             foreach ($types as $type_id => $type) {
